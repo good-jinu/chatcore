@@ -5,6 +5,11 @@
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/good-jinu/chatcore.git",
+    "directory": "packages/cli"
+  },
   "bin": {
     "chatcore": "./dist/cli.mjs"
   },
@@ -25,6 +30,7 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "test": "vitest",
+    "lint:package": "publint",
     "lint:types": "attw --profile esm-only --pack .",
     "typecheck": "tsc --project tsconfig.json"
   },
