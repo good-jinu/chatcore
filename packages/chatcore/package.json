@@ -1,0 +1,46 @@
+{
+  "name": "chatcore",
+  "version": "0.1.0",
+  "description": "An in-process, database-agnostic, event-sourced messaging engine for TypeScript.",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest",
+    "lint:types": "attw --profile esm-only --pack .",
+    "typecheck": "tsc --project tsconfig.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "dev-source": "./src/index.ts",
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./opendal": {
+      "dev-source": "./src/opendal.ts",
+      "types": "./dist/opendal.d.mts",
+      "default": "./dist/opendal.mjs"
+    },
+    "./test": {
+      "dev-source": "./src/test-utils/index.ts",
+      "types": "./dist/test-utils/index.d.mts",
+      "default": "./dist/test-utils/index.mjs"
+    }
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:vitest"
+  }
+}

@@ -1,0 +1,6 @@
+# Marks website/ as its own pnpm workspace root so its (heavy) Docusaurus
+# dependencies are installed in isolation and never bleed into the published
+# `chatcore` package or the repo-root lockfile.
+packages: []
+allowBuilds:
+  core-js: false

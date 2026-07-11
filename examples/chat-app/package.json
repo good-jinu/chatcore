@@ -1,0 +1,23 @@
+{
+  "name": "@chatcore/example-chat-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -C ../../packages/chatcore build && tsc --project tsconfig.json",
+    "db:init": "pnpm build && node dist/init-db.js",
+    "db:reset": "rm -f data/chatcore.sqlite",
+    "dev": "pnpm build && node dist/server.js",
+    "schema:generate": "pnpm -C ../../packages/cli build && chatcore schema generate --dialect sqlite --out schema/chatcore.sql",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "chatcore": "workspace:*",
+    "kysely": "^0.29.2"
+  },
+  "devDependencies": {
+    "@chatcore/cli": "workspace:*",
+    "@types/better-sqlite3": "^7.6.13",
+    "typescript": "catalog:"
+  }
+}

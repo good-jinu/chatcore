@@ -1,0 +1,26 @@
+[env]
+_.file = ".env"
+
+[tools]
+node = "26"
+pnpm = "11"
+
+[tasks.test]
+description = "Run all repository tests and type checks"
+run = [
+	"pnpm test",
+]
+
+[tasks."pre-commit"]
+description = "Execute before commit"
+run = """
+pnpm run lint
+pnpm typecheck
+pnpm test
+pnpm build
+NPM_CONFIG_CACHE="$PWD/.cache/npm" pnpm run lint:types
+pnpm docs:build
+"""
+
+[hooks]
+postinstall = "pnpm install && mise generate git-pre-commit --write --task=pre-commit"

@@ -1,0 +1,65 @@
+name: Docs
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# Allow the GITHUB_TOKEN to deploy to GitHub Pages.
+permissions: {}
+
+# Allow one concurrent deployment; let in-progress runs finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      # Install the SDK's deps so TypeDoc can resolve types (unadapter, zod)
+      # from packages/chatcore/src when generating the API reference.
+      - name: Install workspace
+        run: pnpm install --frozen-lockfile
+
+      # website/ is its own isolated pnpm root (see website/pnpm-workspace.yaml).
+      - name: Install docs site
+        run: pnpm install --frozen-lockfile
+        working-directory: website
+
+      - name: Build docs site
+        run: pnpm run build
+        working-directory: website
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

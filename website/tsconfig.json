@@ -1,0 +1,8 @@
+{
+  "extends": "@docusaurus/tsconfig",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "ESNext.Temporal"]
+  },
+  "exclude": [".docusaurus", "build", "docs/api"]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "chatcore-root",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/good-jinu/chatcore.git"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "format": "biome format . --write",
+    "lint": "biome check . --error-on-warnings",
+    "lint:fix": "biome check . --fix --unsafe",
+    "lint:types": "pnpm -r lint:types",
+    "lint:packages": "pnpm -r lint:package",
+    "changeset": "changeset",
+    "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
+    "ci:release": "pnpm clean && pnpm build && changeset publish",
+    "test": "pnpm -r test",
+    "typecheck": "tsc --build",
+    "docs:build": "pnpm -C website run build",
+    "docs:start": "pnpm -C website run start"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@biomejs/biome": "2.4.4",
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.30.0",
+    "@types/bun": "^1.3.9",
+    "@types/node": "^25.3.2",
+    "@vitest/coverage-istanbul": "catalog:vitest",
+    "@vitest/ui": "catalog:vitest",
+    "publint": "^0.3.17",
+    "typescript": "catalog:",
+    "vitest": "catalog:vitest"
+  }
+}

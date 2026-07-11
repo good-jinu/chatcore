@@ -1,0 +1,24 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "plugin": ["typedoc-plugin-markdown"],
+  "entryPoints": [
+    "../packages/chatcore/src/index.ts",
+    "../packages/chatcore/src/test-utils/index.ts"
+  ],
+  "tsconfig": "../packages/chatcore/tsconfig.json",
+  "out": "docs/api",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "githubPages": false,
+  "hidePageHeader": true,
+  "hideBreadcrumbs": true,
+  "entryFileName": "index",
+  "fileExtension": ".md",
+  "expandObjects": true,
+  "useCodeBlocks": true,
+  "indexFormat": "table",
+  "parametersFormat": "table",
+  "interfacePropertiesFormat": "table",
+  "intentionallyNotExported": ["Row"]
+}
