@@ -1,12 +1,9 @@
 import type { ChatCore } from "../chatcore";
 import { createChatCore } from "../chatcore";
 import type { ChatCoreOptions } from "../options";
-import { createMemoryBlobStorage } from "./memory-blob-storage";
 import type { MemoryDatabase } from "./memory-storage";
 import { createMemoryStorage } from "./memory-storage";
 
-export { createMemoryBlobStorage };
-export type { MemoryBlobRecord } from "./memory-blob-storage";
 export type { MemoryDatabase } from "./memory-storage";
 
 /** The object returned by {@link getTestInstance}. */

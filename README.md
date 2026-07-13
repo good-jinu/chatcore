@@ -12,8 +12,8 @@ engine are left entirely in your hands.
 - **Trivial real-time sync** — a single, monotonically increasing `sequenceId`
   drives global synchronization.
 - **Threaded DAG** — edges between events enable replies and branching timelines.
-- **Optional blob storage** — route images, videos, audio, and other large files
-  to a separate blob backend while events store stable object keys.
+- **Host-owned attachments** — events can carry portable attachment references
+  while the host application owns file storage, authorization, and delivery.
 
 ## Install
 
@@ -59,34 +59,35 @@ package:
 pnpm dlx @chatcore/cli schema generate --dialect sqlite --out migrations/001_chatcore.sql
 ```
 
-For media and attachments, keep event payloads small and store binary objects
-through `blobStorage`. Node applications can use the optional OpenDAL adapter:
+For media and attachments, keep event payloads small and store only opaque,
+host-issued attachment references. ChatCore synchronizes the references; the
+host application owns upload, storage, authorization, delivery, and deletion:
 
 ```ts
-import { createOpenDalBlobStorage } from "chatcore/opendal";
-import { Operator } from "opendal";
+import type { AttachmentReference } from "chatcore";
 
-const flow = createChatCore({
-  storage,
-  blobStorage: createOpenDalBlobStorage(new Operator("s3", {
-    bucket: "chatcore-media",
-    region: "us-east-1",
-  })),
-});
-
-await flow.putBlob({
-  key: "rooms/general/image.png",
-  data: imageBytes,
-  contentType: "image/png",
-});
+// Issued after the host application completes and verifies an upload.
+const attachment = {
+  id: "att_01JABCDEF",
+  kind: "image",
+  name: "image.png",
+  mimeType: "image/png",
+  size: 483_920,
+  width: 1920,
+  height: 1080,
+} satisfies AttachmentReference;
 
 await flow.publishEvent({
   roomId: room.id,
   senderId: "u1",
   type: "message.media",
-  content: { attachmentKey: "rooms/general/image.png" },
+  content: { body: "hello", attachments: [attachment] },
 });
 ```
+
+Do not put object-store keys, credentials, or permanent signed URLs in event
+content. Resolve the opaque attachment id through the host application when a
+client needs to upload or download the underlying file.
 
 ## Engine API
 
@@ -98,9 +99,6 @@ await flow.publishEvent({
 | `getRoomState(roomId)` | The active state events (latest per `[type, stateKey]`). |
 | `getRoomTimeline(roomId, { limit?, beforeSequenceId? })` | A room's events, newest-first. |
 | `getSyncStream({ sinceSequenceId?, limit?, roomIds? })` | Stream of events after a token, oldest-first. Omit `roomIds` for the global stream. |
-| `putBlob({ key, data, contentType? })` | Store media/attachment bytes in the configured blob backend. |
-| `getBlob(key)` / `getBlobMetadata(key)` / `deleteBlob(key)` | Read, inspect, or delete blob objects. |
-| `createBlobReadUrl({ key, expiresSeconds })` | Create a time-limited read URL when the blob backend supports it. |
 
 ## Development
 

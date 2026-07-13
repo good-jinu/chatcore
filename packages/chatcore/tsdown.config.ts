@@ -3,5 +3,5 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
 	dts: { build: true, incremental: true },
 	format: ["esm"],
-	entry: ["./src/index.ts", "./src/opendal.ts", "./src/test-utils/index.ts"],
+	entry: ["./src/index.ts", "./src/test-utils/index.ts"],
 });

@@ -65,40 +65,44 @@ const { flow, db } = getTestInstance();
 
 ## Media and attachments
 
-ChatCore keeps event storage and blob storage separate. Store images, video,
-audio, exports, and other large payloads in `blobStorage`, then put the object
-key in event content:
+ChatCore stores and synchronizes attachment references, not file bytes. The host
+application owns upload, storage, authorization, delivery, and deletion. After
+the host completes and verifies an upload, put its opaque attachment id and
+portable presentation metadata in event content:
 
 ```ts
-await flow.putBlob({
-  key: "rooms/general/photo.png",
-  data: imageBytes,
-  contentType: "image/png",
-});
+import type { AttachmentReference } from "chatcore";
+
+const attachment = {
+  id: "att_01JABCDEF",
+  kind: "image",
+  name: "photo.png",
+  mimeType: "image/png",
+  size: 483_920,
+  width: 1920,
+  height: 1080,
+} satisfies AttachmentReference;
 
 await flow.publishEvent({
   roomId,
   senderId: "u1",
   type: "message.media",
   content: {
-    attachmentKey: "rooms/general/photo.png",
-    contentType: "image/png",
+    body: "A photo",
+    attachments: [attachment],
   },
 });
 ```
 
-Node applications can use ChatCore's OpenDAL adapter for S3, GCS, Azure Blob,
-local filesystem, memory, and other services:
+The attachment id is deliberately opaque to ChatCore. The host may resolve it
+to S3, GCS, R2, a CDN, local storage, or another media service. Do not store
+object-store keys, credentials, or permanent signed URLs in event content.
 
-```ts
-import { createOpenDalBlobStorage } from "chatcore/opendal";
-import { Operator } from "opendal";
-
-const flow = createChatCore({
-  storage,
-  blobStorage: createOpenDalBlobStorage(new Operator("memory")),
-});
-```
+A typical host workflow is: authorize the upload, issue a presigned URL or
+accept a streamed upload, verify the completed object, create an attachment
+record, publish its id in a message, and authorize each later download. The host
+also owns quotas, MIME and size validation, malware scanning, thumbnails,
+transcoding, retention, and orphan cleanup.
 
 ## Provisioning the schema
 

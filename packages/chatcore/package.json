@@ -30,11 +30,6 @@
       "types": "./dist/index.d.mts",
       "default": "./dist/index.mjs"
     },
-    "./opendal": {
-      "dev-source": "./src/opendal.ts",
-      "types": "./dist/opendal.d.mts",
-      "default": "./dist/opendal.mjs"
-    },
     "./test": {
       "dev-source": "./src/test-utils/index.ts",
       "types": "./dist/test-utils/index.d.mts",
