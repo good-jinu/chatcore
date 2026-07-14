@@ -1,6 +1,6 @@
 {
   "name": "chatcore",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An in-process, database-agnostic, event-sourced messaging engine for TypeScript.",
   "type": "module",
   "license": "MIT",
