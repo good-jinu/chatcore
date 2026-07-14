@@ -13,6 +13,36 @@ export type JsonValue =
 /** A JSON object payload. */
 export type JsonObject = { [key: string]: JsonValue };
 
+/** Broad media category used by {@link AttachmentReference}. */
+export type AttachmentKind = "image" | "video" | "audio" | "file";
+
+/**
+ * Host-owned attachment metadata that can be embedded in event content.
+ *
+ * `id` is an opaque identifier. ChatCore stores and synchronizes the reference,
+ * but deliberately does not upload, download, authorize, or delete the
+ * underlying file. The host application resolves the identifier and owns the
+ * complete attachment lifecycle.
+ */
+export type AttachmentReference = JsonObject & {
+	/** Opaque attachment identifier issued by the host application. */
+	id: string;
+	/** Broad media category used by clients for presentation. */
+	kind: AttachmentKind;
+	/** Original filename, when the host chooses to expose it. */
+	name?: string;
+	/** Declared or detected MIME type. */
+	mimeType?: string;
+	/** File size in bytes. */
+	size?: number;
+	/** Pixel width for visual media. */
+	width?: number;
+	/** Pixel height for visual media. */
+	height?: number;
+	/** Playback duration in milliseconds for audio or video. */
+	durationMs?: number;
+};
+
 /**
  * The atomic, immutable unit of state in ChatCore. Once written, a
  * `FlowEvent` is never updated or deleted — the historical state of a room is

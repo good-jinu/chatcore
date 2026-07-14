@@ -1,4 +1,3 @@
-import type { ChatCoreBlobStorage } from "./blob-storage";
 import type { ChatCoreStorage } from "./storage";
 
 /**
@@ -10,12 +9,6 @@ export interface ChatCoreOptions {
 	 * Kysely, Drizzle, Prisma, raw SQL, or any other persistence layer.
 	 */
 	storage: ChatCoreStorage;
-	/**
-	 * Optional blob storage backend used for media, attachments, exports, and
-	 * other large binary payloads. Event data stays in `storage`; blob events
-	 * should store object keys in their JSON content.
-	 */
-	blobStorage?: ChatCoreBlobStorage;
 	/**
 	 * Default page size for {@link ChatCore.getRoomTimeline} and
 	 * {@link ChatCore.getSyncStream}.

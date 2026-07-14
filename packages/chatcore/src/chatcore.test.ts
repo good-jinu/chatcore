@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { TestInstance } from "./test-utils";
-import { createMemoryBlobStorage, getTestInstance } from "./test-utils";
+import { getTestInstance } from "./test-utils";
+import type { AttachmentReference } from "./types";
 import { ChatCoreError } from "./utils/validate";
 
 // Helper: publish N events to a room
@@ -600,79 +601,28 @@ describe("publishEvent — content size ceiling (§3.3)", () => {
 	});
 });
 
-describe("blob storage", () => {
-	it("requires blobStorage before blob methods can be used", async () => {
-		await expect(
-			t.flow.putBlob({
-				key: "media/hello.txt",
-				data: new Uint8Array([1, 2, 3]),
-			}),
-		).rejects.toBeInstanceOf(ChatCoreError);
-	});
+describe("attachment references", () => {
+	it("stores host-owned attachment metadata in event content", async () => {
+		const room = await t.flow.createRoom({ creatorId: "u1" });
+		const attachment: AttachmentReference = {
+			id: "att_01JABCDEF",
+			kind: "video",
+			name: "clip.mp4",
+			mimeType: "video/mp4",
+			size: 10_000,
+			durationMs: 2_500,
+		};
 
-	it("writes, reads, stats, signs, and deletes blobs", async () => {
-		const { storage } = createMemoryBlobStorage();
-		const { flow } = getTestInstance({ blobStorage: storage });
-		const key = "media/room-1/image.png";
-		const data = new Uint8Array([137, 80, 78, 71]);
-
-		await flow.putBlob({
-			key,
-			data,
-			contentType: "image/png",
+		const { event } = await t.flow.publishEvent({
+			roomId: room.id,
+			senderId: "u1",
+			type: "message.media",
+			content: {
+				body: "A short clip",
+				attachments: [attachment],
+			},
 		});
 
-		expect(await flow.getBlob(key)).toEqual(data);
-		expect(await flow.getBlobMetadata(key)).toMatchObject({
-			size: 4,
-			contentType: "image/png",
-		});
-		await expect(
-			flow.createBlobReadUrl({ key, expiresSeconds: 60 }),
-		).resolves.toBe("memory://media%2Froom-1%2Fimage.png?expires=60");
-
-		await flow.deleteBlob(key);
-		expect(await flow.getBlob(key)).toBeNull();
-		expect(await flow.getBlobMetadata(key)).toBeNull();
-	});
-
-	it("stores large media out of event content by referencing a blob key", async () => {
-		const { storage } = createMemoryBlobStorage();
-		const { flow } = getTestInstance({
-			blobStorage: storage,
-			maxContentBytes: 128,
-		});
-		const room = await flow.createRoom({ creatorId: "u1" });
-		const attachmentKey = "media/room-1/video.mp4";
-
-		await flow.putBlob({
-			key: attachmentKey,
-			data: new Uint8Array(10_000),
-			contentType: "video/mp4",
-		});
-
-		await expect(
-			flow.publishEvent({
-				roomId: room.id,
-				senderId: "u1",
-				type: "message.media",
-				content: {
-					attachmentKey,
-					contentType: "video/mp4",
-				},
-			}),
-		).resolves.toMatchObject({ sequenceId: 1 });
-	});
-
-	it("rejects unsafe blob keys", async () => {
-		const { storage } = createMemoryBlobStorage();
-		const { flow } = getTestInstance({ blobStorage: storage });
-
-		await expect(
-			flow.putBlob({
-				key: "../image.png",
-				data: new Uint8Array([1]),
-			}),
-		).rejects.toBeInstanceOf(ChatCoreError);
+		expect(event.content.attachments).toEqual([attachment]);
 	});
 });
